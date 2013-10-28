@@ -1,0 +1,31 @@
+*.gz
+*.pyc
+*.csv
+*.bak
+*~
+*.bk
+heatmap-2.2.1
+Historial diccionarioXML
+Historial OPTICS
+2013 23 04
+build
+*.ogg
+Ejemplos
+Foursquare
+Historial PM_AnalisisDatos
+Miscelaneos
+Resultados
+ScriptsBash
+XML
+*.c
+*.pyx
+*.so
+*.txt
+*.swp
+._pysal-1.4.0
+.ropeproject/
+Consultas Principales
+Ejemplo.Datos
+Ejemplo.Datos.Chico
+Mobility_CDR*
+ipython*
