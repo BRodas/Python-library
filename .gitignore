@@ -29,3 +29,6 @@ Ejemplo.Datos
 Ejemplo.Datos.Chico
 Mobility_CDR*
 ipython*
+Extractor_Muestras_CDROne_BRUTO.py
+ArregladorTablas_CDR_One_BRUTO.py
+ParseoAntenas.py
