@@ -49,13 +49,13 @@ if "__main__" == __name__:
 # ZONA DE ENTREGA DE PARAMETROS
 
     # Se importa el archivo, primero se lee la ruta.
-    path_to_csv = '/home/bernardo/Experimentos_Mobility/'
-    path_to_csv += '36_Comportamiento_Esporadico/'
-    path_to_csv += 'muestra_SanCarlos_27Abr.csv'
+    path_to_csv = '/home/bernardo/'
+    path_to_csv += 'Esporadico/'
+    path_to_csv += 'muestra.csv'
 
     # Archivo de destino
-    archivo_destino = '/home/bernardo/Experimentos_Mobility/'
-    archivo_destino += '36_Comportamiento_Esporadico/'
+    archivo_destino = '/home/bernardo/'
+    archivo_destino += 'Esporadico/'
     archivo_destino += 'tabla_con_UTMs.csv'
 
     # El numero de las columnas de interes.
