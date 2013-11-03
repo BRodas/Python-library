@@ -14,7 +14,7 @@ from decimal import *
 # Importa la libreria de pyproj
 from pyproj import Proj, Geod
 # Se importa la libreria de OPTICS para aplicar el algoritmo,
-# y la de Malla para el achuramiento de zonas 
+# y la de Malla para el achuramiento de zonas
 import OPTICS, Malla
 # Se importa la libreria matematica
 import math
@@ -143,11 +143,14 @@ class ClaseOptics:
 				# Numero del usuario
 				numeroUsuario = str(listadoTuplas[0][0])
 				#Listado del conjunto de objetos
+                import pdb
+                pdb.set_trace()  # XXX BREAKPOINT
+
 				conjuntoObjetos = OPTICS.SetOfObjects( listadoOPTICS )
 				# Entrega de parametros para el calculo de clusters
 				resultadoAlg = OPTICS.FOptics(conjuntoObjetos , Distancia ,  MinPts  )
 
-				# Resultado del algoritmo 
+				# Resultado del algoritmo
 				diccionarioOPTICS[Niv01][Niv02] = resultadoAlg
 				self.resultado_Optics = self.resultado_Optics.append(pandas.DataFrame(resultadoAlg, columns=columns), ignore_index=True)
 
@@ -191,7 +194,7 @@ class ClaseOptics:
 						if len(bolsa) > 1 :
 							num_cluster +=1
 							nombreCluster = str(num_cluster)+' '+ str( round(float(len(bolsa))/len(listado), 5 ))
-							#nombreCluster = 'cluster_'+str(i)  
+							#nombreCluster = 'cluster_'+str(i)
 							# Se crea el cluster
 							diccionarioOPTICS_02.setdefault(Dia ,{})
 							diccionarioOPTICS_02[Dia].setdefault( bloques ,{})
@@ -243,7 +246,7 @@ class ClaseOptics:
 
 	########## METODO PARA GUARDAR LOS RESULTADOS EN UN KML
 	def guardar_kml( self, niveles = 3, diccionario = {'a':{'c':[]},'b':{'d':[]}} , nombre_carpeta='por defecto', centroide = False ):
-		"""Este metodo toma el diccionario entregado agrega su contenido a una instancia que representa un archivo KML, el nombre de la instancia es 
+		"""Este metodo toma el diccionario entregado agrega su contenido a una instancia que representa un archivo KML, el nombre de la instancia es
 				self.Documento_Principal_KML
 
 			niveles: 3 niveles implica un diccionario de tres llaves que termina en un listado de listas o tuplas
@@ -257,16 +260,16 @@ class ClaseOptics:
 			"""
 
 		# se crea una carpeta para el tipo de grafico que se quiere hacer
-		Carpeta_Tipo_Resultado = self.Documento_Principal_KML.newfolder(name = nombre_carpeta)		
+		Carpeta_Tipo_Resultado = self.Documento_Principal_KML.newfolder(name = nombre_carpeta)
 		colores = ['fffff8f0','ffd7ebfa','ffffff00','ffd4ff7f','fffffff0','ffdcf5f5','ffc4e4ff','ff000000','ffcdebff','ffff0000','ffe22b8a','ff2a2aa5','ff87b8de','ffa09e5f']
 		color_pocision = 0
 
 		# Si el diccionario tiene 3 niveles
-		if niveles ==3:	
+		if niveles ==3:
 				# Recorrido por los diferentes niveles del diccionario:
 				for Dia, Dic_Hora in sorted(diccionario.iteritems()):
 					# Se crea la instancia dentro del documento principal, segun el dia.
-					Carpeta_Dia_KML = Carpeta_Tipo_Resultado.newfolder(name = Dia) 
+					Carpeta_Dia_KML = Carpeta_Tipo_Resultado.newfolder(name = Dia)
 
 					# Sigue recorriendo por Hora
 					for Hora , Dic_Cluster in sorted(Dic_Hora.iteritems()):
@@ -287,7 +290,7 @@ class ClaseOptics:
 
 								# Recorrido del listado de puntos
 								for Punto in listado_arreglado:
-	
+
 									try:
 										# Se acomodan los datos
 										latitud=Punto[4]
@@ -307,16 +310,16 @@ class ClaseOptics:
 
 								#raise NameError('Desarrollo')
 
-								
+
 
 	########## METODO PARA GUARDAR LOS RESULTADOS EN UN TXT
 	def guardar_csv( self, niveles = 3, diccionario = {'a':{'c':[]},'b':{'d':[]}} , ubicacion='/media/discoExternoRAID/raul/Python/Resultados/resultado_OPTICS.csv' , modo = 'w', centroide = False):
 		"""Este metodo toma el diccionario entregado y lo guarda en un csv.
-		
+
 			niveles: 3 niveles implica un diccionario de tres llaves que termina en un listado de listas o tuplas,
 					2 niveles implica un diccionario de dos llaves que termina en un listado de listas o tuplas,
 
-					las tuplas si son normales son de la forma  
+					las tuplas si son normales son de la forma
 					[[numero1,nombre1,fecha,hora,latitud,longitud,azimut,ancho,alcance,reachability_distance,core_distance,voronoi], ... ]
 
 					si son de un centroides son de la forma
@@ -324,12 +327,12 @@ class ClaseOptics:
 
 
 			diccionario: el diccionario que se quiere usar, las tuplas pertenecientes al listado de tuplas deben tener el siguiente formato, [ ]
-		
+
 			ubicacion: el camino con el nombre del archivo incluido donde se quiere guardar el archivo.
-		
+
 			modo: los mismo de python concermientes a la escritura.
-		
-			centroide: bolean, si es verdadero se corta la tupla, ya que viene con menos datos.	
+
+			centroide: bolean, si es verdadero se corta la tupla, ya que viene con menos datos.
 			"""
 
 		# definicion de las columnas
@@ -337,8 +340,8 @@ class ClaseOptics:
 
 		guardar_csv = pandas.DataFrame( columns=columns)
 
-		# Si el diccionario tiene 3 niveles 
-		if niveles ==3:	
+		# Si el diccionario tiene 3 niveles
+		if niveles ==3:
 				# Recorrido por los diferentes niveles del diccionario:
 				for Dia, Dic_Hora in diccionario.iteritems():
 					for Hora , Dic_Cluster in Dic_Hora.iteritems():
@@ -406,13 +409,13 @@ class ClaseOptics:
 	######### AQUI VA EL METODO QUE CALCULA EL TRASLAPE DE LOS CLUSTERS
 	def traslaparOPTICS(self):
 
-		# Se recorre el diccionario de centroides, 
+		# Se recorre el diccionario de centroides,
 		# ya que es un valor medio y buen punto de referencia
 		for Dia, Dic_Bloq_Dia in self.centroidesOPTICS.iteritems():
 			for bloque, Dic_Bloq_Hor in Dic_Bloq_Dia.iteritems():
 				# En este "for" se revisan los puntos de los clusters
 				for cluster, listado in Dic_Bloq_Hor.iteritems():
-					
+
 					# Se crea una MALLA para este cluster, donde iran las intersecciones
 					# El unico parametro es el LADO del cuadrado en METROS
 					malla = Malla.malla(ladoCuadradoMetros=50)
@@ -439,9 +442,9 @@ class ClaseOptics:
 					except KeyError:
 						pass
 
-			
 
-					
+
+
 
 
 	###### CON ESTA FUNCION SE CORRIGEN LOS CENTROIDES
@@ -450,11 +453,11 @@ class ClaseOptics:
 		# Para el calculo de distancias entre coordenadas angulares
 		g = Geod(ellps='bessel')
 
-		# Se recorre el diccionario de mayores intensidades, 
+		# Se recorre el diccionario de mayores intensidades,
 		for Dia, Dic_Bloq_Dia in self.conjunto_Mayores_Intensidades.iteritems():
 			for Bloque, Dic_Bloq_Hor in Dic_Bloq_Dia.iteritems():
 				for cluster, conjunto in Dic_Bloq_Hor.iteritems():
-				
+
 					distMinima = 10000
 					for coordenadas in conjunto:
 
@@ -487,13 +490,13 @@ class ClaseOptics:
 	###### AQUI SE ESCRIBE EL METODO QUE CREA EL ARCHIVO KML CON EL AREA DE COBERTURA OPTICS
 	def ArchivoMalla(self, ubicacion = '/media/discoExternoRAID/raul/Python/Resultados/' , nombreArchivo = 'archivoSinNombre', nombreGoogleEarth = 'KML sin nombre'):
 		"""Esta funcion crea el archivo KML con el detalle del resultado de la malla"""
-		
+
 		# Voy a usar el atributo self.traslapeOPTICS
 		# Se importa la libreria
 		import EnsambleXML
 
 		# el transformador. de utm a lat/long, recordar agregar "inverse = 'true' "
-		transformador = Proj( proj='utm', zone='19', ellps='WGS84' )	
+		transformador = Proj( proj='utm', zone='19', ellps='WGS84' )
 
 		# Creacion del archivo con el detalle
 		# Creacion de las etiquetas de documento
@@ -505,7 +508,7 @@ class ClaseOptics:
 		# Se parte recorriendo los dias del diccionario
 		for Dias , Diccio_Bloques in iter( sorted(self.traslapeOPTICS.iteritems() ) ):
 			# Se crea una carpeta correspondiente al dia, en la que se van agregando al final los bloques horarios
-			CarpetaDia = EnsambleXML.EnsXML( 'Folder' , Dias ) 
+			CarpetaDia = EnsambleXML.EnsXML( 'Folder' , Dias )
 
 			# Se recorren los bloques
 			for Bloque , Diccio_Clusters in iter( sorted( Diccio_Bloques.iteritems() ) ):
@@ -515,14 +518,14 @@ class ClaseOptics:
 
 				# Se recorren los cluster que son parte del bloque horario
 				for clusters, Diccio_Coord_x in iter( sorted( Diccio_Clusters.iteritems() ) ):
-					
+
 					# Se crea una carpeta para cada cluster
 					CarpetaCluster = EnsambleXML.EnsXML( 'Folder' , clusters )
 
 
 					# Recorrido de las coordenadas
 					for Coord_x, Diccio_Coord_y in iter( sorted( Diccio_Coord_x.iteritems() ) ):
-					
+
 						for Coord_y, frecuencia in iter( sorted( Diccio_Coord_y.iteritems() ) ):
 
 							# El cambio de color es por cluster
@@ -539,7 +542,7 @@ class ClaseOptics:
 							# Se agrega tal punto a la carpeta de clusters
 							CarpetaCluster.agregar(Placemark.cuerpo)
 
-					
+
 					# La carpeta cluster que se reviso recien se agrega al bloque horario
 					CarpetaBloques.agregar(CarpetaCluster.cuerpo)
 
@@ -585,7 +588,7 @@ class ClaseOptics:
 		for Dias , valoresDias in iter( sorted(self.diccionarioOPTICS.iteritems() ) ):
 
 			# Se crea una carpeta correspondiente al dia, en la que se van agregando al final los bloques horarios
-			CarpetaDia = EnsambleXML.EnsXML( 'Folder' , Dias ) 
+			CarpetaDia = EnsambleXML.EnsXML( 'Folder' , Dias )
 
 			# Se recorren los bloques
 			for bloques , valoresBloques in iter( sorted( valoresDias.iteritems() ) ):
@@ -631,7 +634,7 @@ class ClaseOptics:
 
 					# Se cambia el color
 					i+=1
-					
+
 					# La carpeta cluster que se reviso recien se agrega al bloque horario
 					CarpetaBloques.agregar(CarpetaCluster.cuerpo)
 
@@ -682,7 +685,7 @@ class ClaseOptics:
 		for Dias , valoresDias in iter( sorted( Diccionario.iteritems() ) ):
 
 			# Se crea una carpeta correspondiente al dia, en la que se van agregando al final los bloques horarios
-			CarpetaDia = EnsambleXML.EnsXML( 'Folder' , Dias ) 
+			CarpetaDia = EnsambleXML.EnsXML( 'Folder' , Dias )
 
 			# Se recorren los bloques
 			for bloques , valoresBloques in iter( sorted( valoresDias.iteritems() ) ):
@@ -713,7 +716,7 @@ class ClaseOptics:
 
 					# Se cambia el color
 					i+=1
-					
+
 					# La carpeta cluster que se reviso recien se agrega al bloque horario
 					#CarpetaBloques.agregar(CarpetaCluster.cuerpo)
 
@@ -745,7 +748,7 @@ def centroide( listado = [  ( 0, '', date(2012, 11, 9), timedelta(0, 72757), Dec
 
 
 	# el transformador. de utm a lat/long, recordar agregar "inverse = 'true' "
-	transformador = Proj( proj='utm', zone='19', ellps='WGS84' )	
+	transformador = Proj( proj='utm', zone='19', ellps='WGS84' )
 
 	# Llenado del diccionario.
 	sumaX = 0
