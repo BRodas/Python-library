@@ -6,7 +6,7 @@ import operator
 
 def TI_Forward_Neighborhood(conj_puntos, p, Eps):
     seeds = []
-    forwardThreshold = p.dist - Eps
+    forwardThreshold = p.dist + Eps
     # Hay que declarar la lista a recorrer.
     # Primero se encuentra el indice donde esta el elemento "p"
     # Se seleccionan los elementos desde el inicio hasta el elemento "p"
@@ -16,9 +16,9 @@ def TI_Forward_Neighborhood(conj_puntos, p, Eps):
 
     # Se recorre el listado recien calculado
     for q in listado_a_recorrer:
-        if q.dist < forwardThreshold:
+        if q.dist > forwardThreshold:
             break
-        if np.abs(q.dist - p.dist) <= Eps:
+        if Distance(q.Coords, p.Coords) <= Eps:
             seeds.append(q)
 
     # Se devuelve el listado con las semillas.
@@ -40,7 +40,7 @@ def TI_Backward_Neighborhood(conj_puntos, pto, Eps):
     for q in listado_a_recorrer:
         if q.dist < backwardThreshold:
             break
-        if np.abs(q.dist - pto.dist) <= Eps:
+        if Distance(q.Coords, pto.Coords) <= Eps:
             seeds.append(q)
 
     # Se devuelve el listado con las semillas.
@@ -196,16 +196,19 @@ def TI_DBScan(conj_puntos, eps, MinPts):
 
     # for each point p in the ordered set D starting from
     # the first point until last point in D do
-    #for p in conj_ordenado: (Esta es la linea original)
-    for p in conj_puntos:
-        # if TI-ExpandCluster(D, D', p, ClusterId, Eps, MinPts) then
-        if TI_ExpandCluster(conj_puntos, conj_revisado,
-                            p, ClusterId, eps, MinPts):
-            # ClusterId = NextId(ClusterId)
-            i += 1
-            ClusterId = "Cluster %s" % (i)
-        # endif
-    # endfor
+    # Mientras el listado de puntos por revisar no este vacio, se itera
+    # infinitamente.
+    while len(conj_puntos) != 0:
+        #for p in conj_ordenado: (Esta es la linea original)
+        for p in conj_puntos:
+            # if TI-ExpandCluster(D, D', p, ClusterId, Eps, MinPts) then
+            if TI_ExpandCluster(conj_puntos, conj_revisado,
+                                p, ClusterId, eps, MinPts):
+                # ClusterId = NextId(ClusterId)
+                i += 1
+                ClusterId = "Cluster %s" % (i)
+            # endif
+        # endfor
 
     # return D'// D' is a clustered set of points
     return conj_revisado
@@ -213,19 +216,19 @@ def TI_DBScan(conj_puntos, eps, MinPts):
 
 # La siguiente linea es para el testeo
 if __name__ == "__main__":
-    #conjunto_de_puntos = [[1.00, 1.00], [1.50, 1.00], [2.00, 1.50],
-     #                     [5.00, 5.00], [6.00, 5.50], [5.50, 6.00],
-      #                    [10.00, 11.00], [10.50, 9.50], [10.00, 10.00],
-       #                   [8.00, 1.00], [1.00, 8.00]]
-
-    #conjunto_de_puntos = [[1.00, 1.00], [1.50, 1.00], [2.00, 1.50],
-     #                     [5.00, 5.00], [6.00, 5.50], [5.50, 6.00],
-      #                    [8.00, 1.00], [1.00, 8.00]]
-
     conjunto_de_puntos = [[1.00, 1.00], [1.50, 1.00], [2.00, 1.50],
-                          [5.00, 5.00], [8.00, 1.00], [1.00, 8.00]]
+                          [5.00, 5.00], [6.00, 5.50], [5.50, 6.00],
+                          [10.00, 11.00], [10.50, 9.50], [10.00, 10.00],
+                          [8.00, 1.00], [1.00, 8.00]]
 
-    resultado = TI_DBScan(conjunto_de_puntos, 1, 2)
+    #conjunto_de_puntos = [[1.00, 1.00], [1.50, 1.00], [2.00, 1.50],
+     #                    [5.00, 5.00], [6.00, 5.50], [5.50, 6.00],
+      #                   [8.00, 1.00], [1.00, 8.00]]
+
+    #conjunto_de_puntos = [[1.00, 1.00], [1.50, 1.00], [2.00, 1.50],
+     #                     [5.00, 5.00], [8.00, 1.00], [1.00, 8.00]]
+
+    resultado = TI_DBScan(conjunto_de_puntos, 2, 2)
 
     for elemento in resultado:
         print elemento.ClusterId

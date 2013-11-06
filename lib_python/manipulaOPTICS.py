@@ -143,8 +143,8 @@ class ClaseOptics:
 				# Numero del usuario
 				numeroUsuario = str(listadoTuplas[0][0])
 				#Listado del conjunto de objetos
-                import pdb
-                pdb.set_trace()  # XXX BREAKPOINT
+				import pdb
+				pdb.set_trace()  # XXX BREAKPOINT
 
 				conjuntoObjetos = OPTICS.SetOfObjects( listadoOPTICS )
 				# Entrega de parametros para el calculo de clusters
