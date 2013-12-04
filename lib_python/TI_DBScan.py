@@ -1,3 +1,5 @@
+""" ."""
+
 # Libreria numpy
 import numpy as np
 # Libreria para ordenar instancias en una lista
@@ -5,6 +7,7 @@ import operator
 
 
 def TI_Forward_Neighborhood(conj_puntos, p, Eps):
+    """ ."""
     seeds = []
     forwardThreshold = p.dist + Eps
     # Hay que declarar la lista a recorrer.
@@ -152,47 +155,60 @@ def Distance(punto, pnt_ref):
 
 class clase_punto:
     """Clase que genera un punto con sus atributos"""
-    def __init__(self, punto, pnt_ref):
-        # Se guardan las coordenadas originales
-        self.Coords = punto
+    def __init__(self, punto, pnt_ref, metadata=None):
+        try:
+            # Metadata
+            self.metadata = metadata
+            # Se guardan las coordenadas originales
+            self.Coords = punto[0:2]
+        except:
+            pass
+
         # p.ClusterId = UNCLASSIFIED;
         self.ClusterId = "UNCLASSIFIED"
         # p.dist = Distance(p,r)
-        self.dist = Distance(punto, pnt_ref)
+        self.dist = Distance(punto[0:2], pnt_ref[0:2])
         # p.NeighborsNo = 1
         self.NeighborsNo = 1
         # p.Border = vacio
         self.Border = []
 
 
-def TI_DBScan(conj_puntos, eps, MinPts):
+def TI_DBScan(conj_puntos, eps, MinPts, metadata=None):
     """Esta clase aplica el algoritmo TI-DBScan al conjunto
     de puntos entregados.
 
     conj_puntos = [[coord1, coord2, ...], ...]:
         Es un listado de tuplas o listas, donde los dos
-    primeros elementos de cada lista son las coordenadas."""
-    # /* assert: r denotes a reference point */
-    pnt_ref = conj_puntos[0]
+    primeros elementos de cada lista son las coordenadas y
+    el tercero es METAdata."""
+    try:
+        # /* assert: r denotes a reference point */
+        pnt_ref = conj_puntos[0]
+    except IndexError:
+        pass
+    # the number of points cannot be 1.
+    MinPts = MinPts if MinPts > 1 else 2
+
     # D' = empty set of points;
     conj_revisado = []
+    # Se transforman los puntos
+    try:
+        conj_puntos = [clase_punto(
+            conj_puntos[indice], pnt_ref, metadata=metadata[indice])
+            for indice in xrange(len(conj_puntos))]
+    except TypeError:
+        conj_puntos = [clase_punto(
+            conj_puntos[indice], pnt_ref)
+            for indice in xrange(len(conj_puntos))]
 
-    # for each point p in set D do
-        # p.ClusterId = UNCLASSIFIED;
-        # p.dist = Distance(p,r)
-        # p.NeighborsNo = 1
-        # p.Border = vacio
-    # endfor
-    conj_puntos = [clase_punto(punto, pnt_ref)
-                   for punto in conj_puntos]
-
-    # sort all points in D non-decreasingly w.r.t. field dist;
-    #conj_ordenado = sorted(conj_puntos, key=operator.attrgetter('dist'))
+        # sort all points in D non-decreasingly w.r.t. field dist;
+        #conj_ordenado = sorted(conj_puntos, key=operator.attrgetter('dist'))
     conj_puntos = sorted(conj_puntos, key=operator.attrgetter('dist'))
 
     # ClusterId = label of first cluster;
     i = 1
-    ClusterId = "Cluster %s" % (i)
+    ClusterId = "%s" % (i)
 
     # for each point p in the ordered set D starting from
     # the first point until last point in D do
@@ -206,7 +222,7 @@ def TI_DBScan(conj_puntos, eps, MinPts):
                                 p, ClusterId, eps, MinPts):
                 # ClusterId = NextId(ClusterId)
                 i += 1
-                ClusterId = "Cluster %s" % (i)
+                ClusterId = "%s" % (i)
             # endif
         # endfor
 
