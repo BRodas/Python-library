@@ -3,12 +3,10 @@ from datetime import date,timedelta
 from decimal import *
 
 
-
-
 ##########################################################################
 # OrderSeeds
 
-# Le entrega instancias a esta funcion. El primer atributo corresponde a un LISTADO de instancias, y el segundo corresponde a LA 
+# Le entrega instancias a esta funcion. El primer atributo corresponde a un LISTADO de instancias, y el segundo corresponde a LA
 
 # Funcion de actualizacion
 def update(OrderSeeds, neighbors , CenterObject , indice):
@@ -41,7 +39,7 @@ def update(OrderSeeds, neighbors , CenterObject , indice):
 				# Se agrega una distancia
 				Object.reachability_distance = new_r_dist
 
-				
+
 
 				# Se inserta el objeto en la lista, pero de manera ordenada
 				OrderSeeds.append(Object)
@@ -56,47 +54,10 @@ def update(OrderSeeds, neighbors , CenterObject , indice):
 					# Se modifica
 					Object.reachability_distance = new_r_dist
 
-	
+
 	# Ordenamiento del listado de instancias en base a la distancia
 	import operator
 	OrderSeeds = sorted(OrderSeeds , key=operator.attrgetter('reachability_distance') )
-				
-
-	# ALGORITMO BUBLE SORT
-	# Recorre el listado de vecinos desordenados, para ordenarlos. Se ocupara un algoritmo de Bubble. El algoritmo fue extraido de http://stackoverflow.com/questions/895371/bubble-sort-homework
-	# Asumimos que las distancias estan desordenadas
-	#/\sortede = False
-
-	# Mientras no este ordenada
-	#/\while not sortede:
-
-		# Asumimos a primera que si lo esta
-		#/\sortede = True
-
-		
-
-		# Se recorre el listado
-		#/\for i in range(0, len(OrderSeeds)-1):
-
-			# Si resulta que el "primer" elemento es mayor que el "segundo"
-			#/\if OrderSeeds[i].reachability_distance > OrderSeeds[i+1].reachability_distance:
-
-				# La lista en verdad esta desordenada
-				#/\sortede = False
-
-				# Se retiene el valor "segundo"
-				#/\hold_01 = OrderSeeds[i+1]
-
-				# Se hace la vuelta
-				#/\OrderSeeds[i+1] = OrderSeeds[i]
-
-				# Se vuelve a poner el segundo elemento
-				#/\OrderSeeds[i] = hold_01
-
-
-	#if CenterObject in OrderSeeds: OrderSeeds.remove(CenterObject)
-
-	
 
 	return OrderSeeds
 
@@ -127,10 +88,6 @@ def ExpandClusterOrder(SetOfObjects , Object , epsi = 10000 , MinPts = 2 , lista
 	# En las siguientes dos lineas se escribe el punto en estudio
 	listadoTuplas.append( ( Object.numero, Object.nombre ,Object.fecha , Object.hora , Object.latitud , Object.longitud,Object.azimut , Object.ancho , Object.alcance, Object.reachability_distance , Object.core_distance, Object.voronoi ))
 
-
-
-	#if EscribirArchivo == True: Escribir.write(linea)
-
 	# Lista vacia que se llenara con instancias y su indice
 	OrderSeeds = []
 	indice = 0
@@ -144,7 +101,7 @@ def ExpandClusterOrder(SetOfObjects , Object , epsi = 10000 , MinPts = 2 , lista
 		# Mientras hallan puntos en la cola
 		#while indice < len(OrderSeeds):
 		while OrderSeeds != []:
-		
+
 			# La siguiente linea si bien la define el paper esta intrincicamente
 			# currentObject = OrderSeeds.next()
 
@@ -160,10 +117,10 @@ def ExpandClusterOrder(SetOfObjects , Object , epsi = 10000 , MinPts = 2 , lista
 			# Se calcula la distancia al nucleo
 			currentObject.setCoreDistance(neighbors , epsi , MinPts)
 
-			
+
 			# En las siguientes dos lineas se escribe el punto en estudio
 			listadoTuplas.append(( currentObject.numero ,currentObject.nombre ,currentObject.fecha , currentObject.hora , currentObject.latitud , currentObject.longitud , currentObject.azimut , currentObject.ancho , currentObject.alcance , currentObject.reachability_distance , currentObject.core_distance,currentObject.voronoi ))
-			
+
 
 			# Si el elemento tiene una "core_distance"
 			if currentObject.core_distance != 1000000:
@@ -172,62 +129,20 @@ def ExpandClusterOrder(SetOfObjects , Object , epsi = 10000 , MinPts = 2 , lista
 
 				OrderSeeds = update( OrderSeeds , neighbors , currentObject, indice)
 				indice = -1
-			
+
 			# Remueve el elemento ya revisado
 			if currentObject in OrderSeeds: OrderSeeds.remove(currentObject)
 
 			# Se pasa al siguiente elemento de la lista OrderSeeds
 			indice +=1
 
-
-
-
 	return listadoTuplas
-
-
-
-
-###########################################################################################################################################################
-# Algoritmo OPTICS
-
-# SetOfObjects es una clase, que debe tener como atributo un listado de instancias, pero tambien los vecinos. epsi es un radio, y debe ser en metros. MinPts es un numero natural. Destino, corresponde a un directorio donde se escribe el archivo.
-def FOptics( SetOfObjects , epsi , MinPts ):
-
-	
-	listadoTuplas = []
-
-	# Recorre el conjunto de objetos
-	for Object in SetOfObjects.listadoInstancias:
-
-		
-		# Si la instancia NO ha sido procesado
-		if not Object.Processed:
-
-			# Si no se ha revisado, lo revisa en profundidad
-			listadoTuplas = ExpandClusterOrder(SetOfObjects , Object , epsi , MinPts , listadoTuplas)
-
-			# Se continua con los vecinos del punto anterior
-			neighbors = SetOfObjects.neighbors(Object, epsi)
-			if not neighbors == []:
-				for El_neighbor in neighbors:
-
-					
-					if not El_neighbor.Processed: listadoTuplas = ExpandClusterOrder(SetOfObjects , El_neighbor , epsi , MinPts , listadoTuplas)
-
-
-	# Cierra el archivo que se esta escribiendo
-	#Escribir.close()
-
-	return listadoTuplas
-
-
-
 
 ###########################################################################
 # Clase creadora de SetOfObjects
 
 # La clase creadora de una Instancia con un conjunto de instancias
-class SetOfObjects:
+class function_objects:
 
 	# Inicialisacion de la clase
 	def __init__(self, listadoTuplas = [(),(),()]):
@@ -235,15 +150,15 @@ class SetOfObjects:
 		# Se hace propia el listado de las tuplas
 		self.listadoTuplas = listadoTuplas
 
-		# En esta lista se meteran las mismas tuplas, pero transformadas en instancias		
+		# En esta lista se meteran las mismas tuplas, pero transformadas en instancias
 		self.listadoInstancias = []
 
 		# Estas se recorren una por una
 		for tupla in self.listadoTuplas:
-			
+
 			# Se crea una instancia con la tupla
-			instancia = Object( numero=tupla[0] , nombre = tupla[1] , fecha = tupla[2] , hora = tupla[3] , latitud = tupla[4] , longitud = tupla[5], azimut=tupla[6], ancho=tupla[7],alcance=tupla[8], voronoi = tupla[9] )
-		
+			instancia = Object(numero=tupla[0], nombre=tupla[1], fecha=tupla[2], hora=tupla[3], latitud=tupla[4], longitud=tupla[5], azimut=tupla[6], ancho=tupla[7], alcance=tupla[8], voronoi=tupla[9])
+
 			# La instancia recien creada de anade al listado de instancias
 			self.listadoInstancias.append(instancia)
 
@@ -291,46 +206,8 @@ class SetOfObjects:
 		import operator
 		vecinosOrdenados = sorted(vecinosDesordenados , key=operator.attrgetter('distancia') )
 
-
-		#2013-04-16 OMISION 1 (INICIO)
-		# Recorre el listado de vecinos desordenados, para ordenarlos. Se ocupara un algoritmo de Bubble. El algoritmo fue extraido de http://stackoverflow.com/questions/895371/bubble-sort-homework
-		# Asumimos que las distancias estan desordenadas
-		#/\sortede = False
-
-		# Mientras no este ordenada
-		#/\while not sortede:
-
-			# Asumimos a primera que si lo esta
-			#/\sortede = True
-
-			# Se recorre el listado
-			#/\for i in range(0, len(distanciasOrdenadas)-1):
-
-				# Si resulta que el "primer" elemento es mayor que el "segundo"
-				#/\if distanciasOrdenadas[i] > distanciasOrdenadas[i+1]:
-
-					# La lista en verdad esta desordenada
-					#/\sortede = False
-
-					# Se retiene el valor "segundo"
-					#/\hold_01 = distanciasOrdenadas[i+1]
-					#/\hold_02 = vecinosOrdenados[i+1]
-
-					# Se hace la vuelta
-					#/\distanciasOrdenadas[i+1] = distanciasOrdenadas[i]
-					#/\vecinosOrdenados[i+1] = vecinosOrdenados[i]
-
-					# Se vuelve a poner el segundo elemento
-					#/\distanciasOrdenadas[i] = hold_01
-					#/\vecinosOrdenados[i] = hold_02
-		#2013-04-16 OMISION 1 (FIN)
-
-
-
-
 		# Se debuelve el listado de vecinos
-		return vecinosOrdenados		
-
+		return vecinosOrdenados
 
 
 ###########################################################################
@@ -356,7 +233,7 @@ class Object:
 		self.reachability_distance = 1000000
 		self.core_distance = 1000000
 
-	# Funcion que calcula la "core distance". neighbors es el listado de instancias correspondientes a puntos vecinos al principal. 
+	# Funcion que calcula la "core distance". neighbors es el listado de instancias correspondientes a puntos vecinos al principal.
 	# neighbors VIENE ORDENADO POR DISTANCIAS, EL CERO ES EL VECINO MAS CERCANO.
 	def setCoreDistance(self , neighbors , epsi , MinPts):
 
@@ -377,4 +254,38 @@ class Object:
 
 			# Se calcula la core_distance, en metros
 			self.core_distance = distancia
+
+###########################################################################################################################################################
+# Algoritmo OPTICS
+
+# SetOfObjects es una clase, que debe tener como atributo un listado de instancias, pero tambien los vecinos. epsi es un radio, y debe ser en metros. MinPts es un numero natural. Destino, corresponde a un directorio donde se escribe el archivo.
+def FOptics( SetOfObjects , epsi , MinPts ):
+
+	SetOfObjects = function_objects(SetOfObjects)
+
+	listadoTuplas = []
+
+	# Recorre el conjunto de objetos
+	for Object in SetOfObjects.listadoInstancias:
+
+
+		# Si la instancia NO ha sido procesado
+		if not Object.Processed:
+
+			# Si no se ha revisado, lo revisa en profundidad
+			listadoTuplas = ExpandClusterOrder(SetOfObjects , Object , epsi , MinPts , listadoTuplas)
+
+			# Se continua con los vecinos del punto anterior
+			neighbors = SetOfObjects.neighbors(Object, epsi)
+			if not neighbors == []:
+				for El_neighbor in neighbors:
+
+
+					if not El_neighbor.Processed: listadoTuplas = ExpandClusterOrder(SetOfObjects , El_neighbor , epsi , MinPts , listadoTuplas)
+
+
+	# Cierra el archivo que se esta escribiendo
+	#Escribir.close()
+
+	return listadoTuplas
 

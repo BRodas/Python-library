@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# <nbformat>2</nbformat>
+
+# <codecell>
+
 """ ."""
 
 # Libreria numpy
@@ -5,11 +10,12 @@ import numpy as np
 # Libreria para ordenar instancias en una lista
 import operator
 
+# <codecell>
 
-def TI_Forward_Neighborhood(conj_puntos, p, Eps):
+def TI_Forward_Neighborhood(conj_puntos, p, Eps, mean_radius):
     """ ."""
     seeds = []
-    forwardThreshold = p.dist + Eps
+    forwardThreshold = p.dist + p.eps_dist(Eps, mean_radius)
     # Hay que declarar la lista a recorrer.
     # Primero se encuentra el indice donde esta el elemento "p"
     # Se seleccionan los elementos desde el inicio hasta el elemento "p"
@@ -21,16 +27,17 @@ def TI_Forward_Neighborhood(conj_puntos, p, Eps):
     for q in listado_a_recorrer:
         if q.dist > forwardThreshold:
             break
-        if Distance(q.Coords, p.Coords) <= Eps:
+        if Distance(q.Coords, p.Coords) <= p.eps_dist(Eps, mean_radius):
             seeds.append(q)
 
     # Se devuelve el listado con las semillas.
     return seeds
 
+# <codecell>
 
-def TI_Backward_Neighborhood(conj_puntos, pto, Eps):
+def TI_Backward_Neighborhood(conj_puntos, pto, Eps, mean_radius):
     seeds = []
-    backwardThreshold = pto.dist - Eps
+    backwardThreshold = pto.dist - pto.eps_dist(Eps, mean_radius)
     # Hay que declarar la lista a recorrer.
     # Primero se encuentra el indice donde esta el elemento "p"
     # Se seleccionan los elementos desde el inicio hasta el elemento "p"
@@ -43,27 +50,29 @@ def TI_Backward_Neighborhood(conj_puntos, pto, Eps):
     for q in listado_a_recorrer:
         if q.dist < backwardThreshold:
             break
-        if Distance(q.Coords, pto.Coords) <= Eps:
+        if Distance(q.Coords, pto.Coords) <= pto.eps_dist(Eps, mean_radius):
             seeds.append(q)
 
     # Se devuelve el listado con las semillas.
     return seeds
 
+# <codecell>
 
-def TI_Neighborhood(conj_puntos, p, Eps):
-    parte_1 = TI_Backward_Neighborhood(conj_puntos, p, Eps)
-    parte_2 = TI_Forward_Neighborhood(conj_puntos, p, Eps)
+def TI_Neighborhood(conj_puntos, p, Eps, mean_radius):
+    parte_1 = TI_Backward_Neighborhood(conj_puntos, p, Eps, mean_radius)
+    parte_2 = TI_Forward_Neighborhood(conj_puntos, p, Eps, mean_radius)
     return parte_1 + parte_2
 
+# <codecell>
 
 def TI_ExpandCluster(conj_puntos, conj_revisado,
-                     p, ClId, Eps, MinPts):
+                     p, ClId, Eps, MinPts, mean_radius):
     """conj_puntos esta ordenado de manera creciente respecto a las
     distancias con el punto de referencia"""
 
     # Se explora el conjunto de puntos alrededor del punto "p". Notese que
     # seeds es un conjunto o listado de puntos.
-    seeds = TI_Neighborhood(conj_puntos, p, Eps)
+    seeds = TI_Neighborhood(conj_puntos, p, Eps, mean_radius)
     # Se cuentan los puntos alrededor de "p", incluyendose a si mismo
     p.NeighborsNo += len(seeds)
     # "p" puede ser ruido o un punto de borde
@@ -90,9 +99,6 @@ def TI_ExpandCluster(conj_puntos, conj_revisado,
             q.ClusterId = ClId
             q.NeighborsNo += 1
 
-        # Ahora para cada punto en el borde de p
-        # COMO PROGRAMAR ESTO ESTA COMPLICADO, LO SIGUIENTE ES UNA PROPUESTA.
-        # ADEMAS SE PRESENTA EL CODIRO EN EL PAPER:
         #for each point q in p.Border do
         #    D'.q.ClusterId = ClId; //assign cluster id to q in D'
         #endfor
@@ -112,7 +118,7 @@ def TI_ExpandCluster(conj_puntos, conj_revisado,
         while len(seeds) > 0:
             # De alguna manera en este while se repite el proceso
             curPoint = seeds[0]
-            curSeeds = TI_Neighborhood(conj_puntos, curPoint, Eps)
+            curSeeds = TI_Neighborhood(conj_puntos, curPoint, Eps, mean_radius)
             curPoint.NeighborsNo += len(curSeeds)
             # i curPoint esta en el borde
             if curPoint.NeighborsNo < MinPts:
@@ -145,6 +151,7 @@ def TI_ExpandCluster(conj_puntos, conj_revisado,
         # Se devuelve el valor logico.
         return True
 
+# <codecell>
 
 def Distance(punto, pnt_ref):
     """Funcion que calcula la distancia en dos dimenciones"""
@@ -152,6 +159,7 @@ def Distance(punto, pnt_ref):
     pnt_ref = np.array(pnt_ref[0:2])
     return np.sqrt(np.sum(np.power(punto - pnt_ref, 2)))
 
+# <codecell>
 
 class clase_punto:
     """Clase que genera un punto con sus atributos"""
@@ -172,7 +180,15 @@ class clase_punto:
         self.NeighborsNo = 1
         # p.Border = vacio
         self.Border = []
+      
+    def eps_dist(self, eps, mean_radius):
+        return np.multiply(
+                           eps,
+                           np.true_divide(
+                                          self.dist,
+                                          mean_radius))
 
+# <codecell>
 
 def TI_DBScan(conj_puntos, eps, MinPts, metadata=None):
     """Esta clase aplica el algoritmo TI-DBScan al conjunto
@@ -184,7 +200,7 @@ def TI_DBScan(conj_puntos, eps, MinPts, metadata=None):
     el tercero es METAdata."""
     try:
         # /* assert: r denotes a reference point */
-        pnt_ref = conj_puntos[0]
+        pnt_ref = np.sum(np.array(conj_puntos), axis=0)/len(conj_puntos)
     except IndexError:
         pass
     # the number of points cannot be 1.
@@ -205,7 +221,15 @@ def TI_DBScan(conj_puntos, eps, MinPts, metadata=None):
         # sort all points in D non-decreasingly w.r.t. field dist;
         #conj_ordenado = sorted(conj_puntos, key=operator.attrgetter('dist'))
     conj_puntos = sorted(conj_puntos, key=operator.attrgetter('dist'))
-
+    
+    # once the points are sorted the percentage is calculated
+    num_points = 0
+    cum_dist = 0
+    for point in conj_puntos:
+        num_points += 1
+        cum_dist += point.dist
+    mean_radius = np.true_divide(cum_dist,num_points)
+    
     # ClusterId = label of first cluster;
     i = 1
     ClusterId = "%s" % (i)
@@ -219,7 +243,7 @@ def TI_DBScan(conj_puntos, eps, MinPts, metadata=None):
         for p in conj_puntos:
             # if TI-ExpandCluster(D, D', p, ClusterId, Eps, MinPts) then
             if TI_ExpandCluster(conj_puntos, conj_revisado,
-                                p, ClusterId, eps, MinPts):
+                                p, ClusterId, eps, MinPts, mean_radius):
                 # ClusterId = NextId(ClusterId)
                 i += 1
                 ClusterId = "%s" % (i)
@@ -229,6 +253,7 @@ def TI_DBScan(conj_puntos, eps, MinPts, metadata=None):
     # return D'// D' is a clustered set of points
     return conj_revisado
 
+# <codecell>
 
 # La siguiente linea es para el testeo
 if __name__ == "__main__":
@@ -250,3 +275,4 @@ if __name__ == "__main__":
         print elemento.ClusterId
         print elemento.Coords
         print ""
+
