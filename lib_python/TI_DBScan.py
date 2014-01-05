@@ -109,7 +109,7 @@ def TI_ExpandCluster(conj_puntos, conj_revisado,
         # Mientras la cantidad de elementos en el listado de las semillas sea
         # mayor a cero, o sea mientras halla UN elemento se debe realizar la
         # siguiente iteracion:
-        while len(seeds) > 0:
+        while seeds:
             # De alguna manera en este while se repite el proceso
             curPoint = seeds[0]
             curSeeds = TI_Neighborhood(conj_puntos, curPoint, Eps)
@@ -120,7 +120,8 @@ def TI_ExpandCluster(conj_puntos, conj_revisado,
                     q.NeighborsNo += 1
             # Si curPoint es nucleo
             else:
-                for q in curSeeds:
+                while curSeeds:
+                    q = curSeeds[0]
                     q.NeighborsNo += 1
                     if q.ClusterId == "UNCLASSIFIED":
                         q.ClusterId = ClId
@@ -214,15 +215,16 @@ def TI_DBScan(conj_puntos, eps, MinPts, metadata=None):
     # the first point until last point in D do
     # Mientras el listado de puntos por revisar no este vacio, se itera
     # infinitamente.
-    while len(conj_puntos) != 0:
+    while conj_puntos:
         #for p in conj_ordenado: (Esta es la linea original)
-        for p in conj_puntos:
-            # if TI-ExpandCluster(D, D', p, ClusterId, Eps, MinPts) then
-            if TI_ExpandCluster(conj_puntos, conj_revisado,
-                                p, ClusterId, eps, MinPts):
-                # ClusterId = NextId(ClusterId)
-                i += 1
-                ClusterId = "%s" % (i)
+        p = conj_puntos[0]
+        #for p in conj_puntos:
+        # if TI-ExpandCluster(D, D', p, ClusterId, Eps, MinPts) then
+        if TI_ExpandCluster(conj_puntos, conj_revisado,
+                            p, ClusterId, eps, MinPts):
+            # ClusterId = NextId(ClusterId)
+            i += 1
+            ClusterId = "%s" % (i)
             # endif
         # endfor
 
