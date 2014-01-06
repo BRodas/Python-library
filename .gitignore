@@ -1,4 +1,5 @@
 *.gz
+RECORDATORIOS_IMPORTANTES
 *.pyc
 *.csv
 *.bak

@@ -1,8 +1,0 @@
-# IPython log file
-
-get_ipython().magic(u'logstart desarrollo_21_agosto_2013')
-get_ipython().magic(u'logstate')
-get_ipython().magic(u'run Mobility_CDR_One_BRUTO_08_2013.py')
-get_ipython().magic(u'run -d Mobility_CDR_One_BRUTO_08_2013.py')
-get_ipython().magic(u'run Mobility_CDR_One_BRUTO_08_2013.py')
-exit()
